@@ -105,7 +105,7 @@ func chatRoom(initial_user *user, room_channel chan user, roomName string) {
 		select {
 		case newUser := <-room_channel:
 			users = append(users, newUser)
-			sendMessages(initial_user.username+" has joined", users, user{}, roomName)
+			sendMessages(initial_user.username+" has joined", users, newUser, roomName)
 		default:
 			for i := 0; i < len(users); i++ {
 				mesg, _ := users[i].reader.ReadString('\n')
@@ -124,6 +124,7 @@ func sendMessages(message string, users []user, sender user, roomName string) {
 	for i := 0; i < len(users); i++ {
 		log.Print("Sending...")
 		if users[i] != sender {
+
 			mesg := "CHAT: " + roomName + "\nCLIENT_NAME: " + strings.Split(sender.username, "client")[1] + "\nMESSAGE:" + string(message) + "\n\n"
 			users[i].writer.Write([]byte(mesg))
 			users[i].writer.Flush()
