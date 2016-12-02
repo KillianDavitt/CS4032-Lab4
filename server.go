@@ -109,7 +109,7 @@ func chatRoom(initial_user *user, room_channel chan user, roomName string) {
 		default:
 			for i := 0; i < len(users); i++ {
 				mesg, _ := users[i].reader.ReadString('\n')
-				log.Print("User sent message: " + mesg)
+				//log.Print("User sent message: " + mesg)
 				sendMessages(mesg, users, users[i], roomName)
 			}
 
@@ -122,7 +122,7 @@ func chatRoom(initial_user *user, room_channel chan user, roomName string) {
 */
 func sendMessages(message string, users []user, sender user, roomName string) {
 	for i := 0; i < len(users); i++ {
-		log.Print("Sending...")
+		//log.Print("Sending...")
 		if users[i] != sender {
 			log.Print(sender.username)
 			mesg := "CHAT: " + roomName + "\nCLIENT_NAME:" + sender.username + "\nMESSAGE:" + string(message) + "\n\n"
