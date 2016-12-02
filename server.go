@@ -80,7 +80,7 @@ func interpretMessage(message string, reader *bufio.Reader, writer *bufio.Writer
 		new_user.username = username
 		new_user.reader = reader
 		new_user.writer = writer
-		roomName := strings.Split(attribs[0][14:], "roomName")[1]
+		roomName := strings.Split(attribs[0][14:], "room")[1]
 		room := rooms[roomName]
 		if room == nil {
 			rooms[roomName] = make(chan user)
