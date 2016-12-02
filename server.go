@@ -73,7 +73,7 @@ func interpretMessage(message string, reader *bufio.Reader, writer *bufio.Writer
 	if attribs[0][0:13] == "JOIN_CHATROOM" {
 		log.Print("User is joining a room")
 		log.Print(attribs[3])
-		username := strings.TrimSpaces(strings.Join(strings.Split(attribs[3], ":")[1:], ""))
+		username := strings.TrimSpace(strings.Join(strings.Split(attribs[3], ":")[1:], ""))
 		log.Print(username)
 		var new_user_obj user
 		new_user := &new_user_obj
