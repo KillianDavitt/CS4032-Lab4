@@ -13,6 +13,7 @@ type user struct {
 	reader   *bufio.Reader
 	writer   *bufio.Writer
 	username string
+	join_id  string
 }
 
 func main() {
@@ -80,6 +81,7 @@ func interpretMessage(message string, reader *bufio.Reader, writer *bufio.Writer
 		new_user.username = username
 		new_user.reader = reader
 		new_user.writer = writer
+		new_user.join_id = "0"
 		roomName := attribs[0][14:]
 		room := rooms[roomName]
 		if room == nil {
@@ -113,7 +115,7 @@ func chatRoom(initial_user *user, room_channel chan user, roomName string) {
 				mesg, _ := users[i].reader.ReadString('\n')
 				//log.Print("User sent message: " + mesg)
 				if strings.HasPrefix(mesg, "LEAVE_CHATROOM") {
-					users[i].writer.Write([]byte("LEFT_CHATROOM:" + strings.Split(roomName, "room")[1] + "\nJOIN_ID: "))
+					users[i].writer.Write([]byte("LEFT_CHATROOM:" + strings.Split(roomName, "room")[1] + "\nJOIN_ID:" + users[i].join_id))
 					users[i].writer.Flush()
 				} else {
 					sendMessages(mesg, users, users[i], roomName)
