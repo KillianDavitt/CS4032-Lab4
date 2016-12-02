@@ -47,7 +47,7 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 	}
 
 	if strings.HasPrefix(l1, "HELO") {
-		reply := l1 + "IP:10.62.0.83\nPort:8000\nStudentID:13319024\n"
+		reply := l1 + "IP:10.62.0.83\nPort:8000\nStudentID:13319024"
 		log.Print(reply)
 		conn.Write([]byte(reply))
 		return
