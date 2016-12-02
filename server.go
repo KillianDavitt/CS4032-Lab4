@@ -27,6 +27,7 @@ func main() {
 	terminate_chan := make(chan bool)
 	for {
 		conn, err := listener.Accept()
+		log.Print("New conn")
 		defer conn.Close()
 		if err != nil {
 			fmt.Println("Fatal Error")
