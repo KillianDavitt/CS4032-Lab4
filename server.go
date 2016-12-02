@@ -113,7 +113,8 @@ func chatRoom(initial_user *user, room_channel chan user, roomName string) {
 				mesg, _ := users[i].reader.ReadString('\n')
 				//log.Print("User sent message: " + mesg)
 				if strings.HasPrefix(mesg, "LEAVE_CHATROOM") {
-					sendMessages("LEFT_CHATROOM: ", users, users[i], roomName)
+					users[i].writer.Write([]byte("LEFT_CHATROOM: "))
+					users[i].writer.Flush()
 				}
 				sendMessages(mesg, users, users[i], roomName)
 			}
