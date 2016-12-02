@@ -125,7 +125,7 @@ func chatRoom(initial_user *user, room_channel chan user, roomName string) {
 func sendMessages(message string, users []user, sender user, roomName string) {
 	for i := 0; i < len(users); i++ {
 		//log.Print("Sending...")
-		if users[i] != sender {
+		if users[i] == sender {
 			log.Print(sender.username)
 			mesg := "CHAT: " + roomName + "\nCLIENT_NAME:" + sender.username + "\nMESSAGE:" + string(message) + "\n\n"
 			users[i].writer.Write([]byte(mesg))
