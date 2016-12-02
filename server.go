@@ -101,7 +101,7 @@ func interpretMessage(message string, reader *bufio.Reader, writer *bufio.Writer
 func chatRoom(initial_user *user, room_channel chan user, roomName string) {
 	users := make([]user, 0, 0)
 	users = append(users, *initial_user)
-	sendMessages(initial_user.username+" has joined", users, user{}, strings.Split(roomName, "room")[1])
+	sendMessages(initial_user.username+" has joined", users, initialUser, strings.Split(roomName, "room")[1])
 
 	for {
 		select {
