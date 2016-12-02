@@ -36,6 +36,7 @@ func main() {
 }
 
 func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan bool, rooms map[string]chan user) {
+	log.Print("Accepted new conn")
 	reader := bufio.NewReader(conn)
 	writer := bufio.NewWriter(conn)
 	l1, _ := reader.ReadString(byte('\n'))
