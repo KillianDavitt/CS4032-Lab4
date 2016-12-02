@@ -86,6 +86,7 @@ func interpretMessage(message string, reader *bufio.Reader, writer *bufio.Writer
 			go chatRoom(new_user, rooms[roomName], roomName)
 			reply := "JOINED_CHATROOM: [chatroom name]\nSERVER_IP: 10.62.0.83\nPORT: 8000\nROOM_REF: [integer that uniquely identifies chat room on server]\nJOIN_ID: [integer that uniquely identifies client joining]"
 			writer.Write([]byte(reply))
+			writer.Flush()
 		} else {
 			// Room already exists, send the conn in  the channel
 			room <- *new_user
