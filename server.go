@@ -99,7 +99,7 @@ func interpretMessage(message string, reader *bufio.Reader, writer *bufio.Writer
 func chatRoom(initial_user *user, room_channel chan user, roomName string) {
 	users := make([]user, 0, 0)
 	users = append(users, *initial_user)
-	sendMessages(strings.Split(initial_user.username, "client")[1]+" has joined", users, user{}, strings.Split(roomName, "room")[1])
+	sendMessages(initial_user.username+" has joined", users, user{}, strings.Split(roomName, "room")[1])
 
 	for {
 		select {
@@ -124,7 +124,7 @@ func sendMessages(message string, users []user, sender user, roomName string) {
 	for i := 0; i < len(users); i++ {
 		log.Print("Sending...")
 		if users[i] != sender {
-			mesg := "CHAT: " + roomName + "\nCLIENT_NAME: " + sender.username + "\nMESSAGE:" + string(message) + "\n\n"
+			mesg := "CHAT: " + roomName + "\nCLIENT_NAME: " + strings.Split(sender.username, "client")[1] + "\nMESSAGE:" + string(message) + "\n\n"
 			users[i].writer.Write([]byte(mesg))
 			users[i].writer.Flush()
 			log.Print("Sent message")
