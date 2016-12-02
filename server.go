@@ -125,7 +125,7 @@ func sendMessages(message string, users []user, sender user, roomName string) {
 		log.Print("Sending...")
 		if users[i] != sender {
 
-			mesg := "CHAT: " + roomName + "\nCLIENT_NAME: " + "\nMESSAGE:" + string(message) + "\n\n"
+			mesg := "CHAT: " + roomName + "\nCLIENT_NAME:" + sender.username + "\nMESSAGE:" + string(message) + "\n\n"
 			users[i].writer.Write([]byte(mesg))
 			users[i].writer.Flush()
 			log.Print("Sent message")
