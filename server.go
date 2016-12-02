@@ -45,6 +45,11 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 	if l1 == "KILL_SERVICE" {
 		os.Exit(0)
 	}
+
+	if strings.HasPrefix(l1, "HELO") {
+		conn.Write([]byte(l1))
+		return
+	}
 	l2, _ := reader.ReadString(byte('\n'))
 	l3, _ := reader.ReadString(byte('\n'))
 	l4, _ := reader.ReadString(byte('\n'))
