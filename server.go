@@ -84,7 +84,7 @@ func interpretMessage(message string, reader *bufio.Reader, writer *bufio.Writer
 			rooms[roomName] = make(chan user)
 			log.Print("Creating chat room")
 			go chatRoom(new_user, rooms[roomName], roomName)
-			reply := "JOINED_CHATROOM:" + roomName + "\nSERVER_IP: 10.62.0.83\nPORT: 8000\nROOM_REF: 1\nJOIN_ID:2"
+			reply := "JOINED_CHATROOM:" + roomName + "\nSERVER_IP: 10.62.0.83\nPORT: 8000\nROOM_REF: 1\nJOIN_ID:1"
 			writer.Write([]byte(reply))
 			writer.Flush()
 		} else {
