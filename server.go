@@ -78,7 +78,7 @@ func interpretMessage(message string, reader *bufio.Reader, writer *bufio.Writer
 		new_user.username = username
 		new_user.reader = reader
 		new_user.writer = writer
-		roomName := attribs[0][13:]
+		roomName := attribs[0][14:]
 		room := rooms[roomName]
 		if room == nil {
 			rooms[roomName] = make(chan user)
