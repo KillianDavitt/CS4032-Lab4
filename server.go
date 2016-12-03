@@ -74,7 +74,7 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 		if !madeUser {
 			log.Print("made new user")
 			madeUser = true
-			new_user = newUser(reader, writer, l4)
+			new_user = newUser(reader, writer, l4, len(rooms))
 		}
 		message := l1 + l2 + l3 + l4
 
