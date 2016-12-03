@@ -16,7 +16,7 @@ func main() {
 	if err != nil {
 		fmt.Println("Fatal Error")
 	}
-	rooms := make(map[string]chatroom)
+	rooms := make(map[string]*chatroom)
 
 	terminate_chan := make(chan bool)
 	for {
@@ -30,11 +30,12 @@ func main() {
 	}
 }
 
-func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan bool, rooms map[string]chatroom) {
+func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan bool, rooms map[string]*chatroom) {
 	log.Print("Accepted new conn")
 	reader := bufio.NewReader(conn)
 	writer := bufio.NewWriter(conn)
-	var new_user user
+	var new_user *User
+	madeUser := false
 	for {
 		l1, _ := reader.ReadString(byte('\n'))
 
@@ -50,7 +51,9 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 		l2, _ := reader.ReadString(byte('\n'))
 		l3, _ := reader.ReadString(byte('\n'))
 		l4, _ := reader.ReadString(byte('\n'))
-		if new_user == nil {
+		if !madeUser {
+			log.Print("made new user")
+			madeUser = true
 			new_user = newUser(reader, writer, l4)
 		}
 		message := l1 + l2 + l3 + l4
@@ -63,21 +66,26 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 			return
 		}
 		if strings.HasPrefix(lines[0], "CHAT:") {
-			roomName := strings.Split(lines[0], "CHAT:")
+			roomName := strings.Split(lines[0], "CHAT:")[1]
 			room := rooms[roomName]
-			messageRoom(new_user, room)
-		} else if strings.HasPrefix(lines[0], "JOIN_CHATROOM") {
+			messageRoom("HI", room)
+		} else if strings.HasPrefix(lines[0], "JOIN_CHATROOM:") {
+			log.Print("Joining chatroom")
 			roomName := lines[0][14:]
+			log.Print("found name " + roomName)
 			room := rooms[roomName]
+			log.Print("found room")
 			if room == nil {
 				// Room doesn't exist, make it
-				rooms[roomName] = newChatroom(roomName)
+				rooms[roomName] = newRoom()
 				go chatRoom(new_user, rooms[roomName])
 			} else {
 				// Room already exists, send the conn in  the channel
 				joinRoom(new_user, room)
 			}
 		} else if strings.HasPrefix(lines[0], "LEAVE_CHATROOM") {
+			roomName := strings.Split(lines[0], "LEAVE_CHATROOM:")[1]
+			room := rooms[roomName]
 			leaveRoom(new_user, room)
 		}
 	}

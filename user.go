@@ -1,16 +1,22 @@
 package main
 
-type user struct {
-	reader   *bufio.Reader
-	writer   *bufio.Writer
-	username string
-	join_id  string
+import (
+	"bufio"
+	"strings"
+)
+
+type User struct {
+	Reader   *bufio.Reader
+	Writer   *bufio.Writer
+	Username string
+	JoinId   string
 }
 
-func newUser(reader *bufio.Reader, writer *bufio.Writer, l4 string) {
+func newUser(reader *bufio.Reader, writer *bufio.Writer, l4 string) *User {
 
 	username := strings.Split(l4, "CLIENT_NAME:")[1]
 
-	new_user := &user{reader, writer, username, id}
+	id := "3"
+	new_user := &User{reader, writer, username, id}
 	return new_user
 }
