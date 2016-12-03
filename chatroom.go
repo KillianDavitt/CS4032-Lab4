@@ -39,6 +39,7 @@ func chatRoom(initial_user *User, room *chatroom) {
 	users = append(users, *initial_user)
 	room.Users = users
 	log.Print("New chatroom is made")
+	initial_user.Writer.Write([]byte("JOINED_CHATROOM: " + room.RoomName + "\nSERVER_IP: 10.82.0.63\nPORT: 8000\nROOM_REF: 1\nJOIN_ID: 2\n"))
 	sendMessages(initial_user.Username+" has joined", room, initial_user)
 	for {
 		select {
