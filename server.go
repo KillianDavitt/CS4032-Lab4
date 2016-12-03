@@ -9,13 +9,6 @@ import (
 	"strings"
 )
 
-type user struct {
-	reader   *bufio.Reader
-	writer   *bufio.Writer
-	username string
-	join_id  string
-}
-
 func main() {
 	port := os.Args[1]
 	port = ":" + port
@@ -23,7 +16,7 @@ func main() {
 	if err != nil {
 		fmt.Println("Fatal Error")
 	}
-	rooms := make(map[string]chan user)
+	rooms := make(map[string]chatroom)
 
 	terminate_chan := make(chan bool)
 	for {
@@ -37,109 +30,55 @@ func main() {
 	}
 }
 
-func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan bool, rooms map[string]chan user) {
+func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan bool, rooms map[string]chatroom) {
 	log.Print("Accepted new conn")
 	reader := bufio.NewReader(conn)
 	writer := bufio.NewWriter(conn)
-	l1, _ := reader.ReadString(byte('\n'))
-
-	if l1 == "KILL_SERVICE" {
-		os.Exit(0)
-	}
-
-	if strings.HasPrefix(l1, "HELO") {
-		reply := l1 + "IP:10.62.0.83\nPort:8000\nStudentID:13319024"
-		log.Print(reply)
-		conn.Write([]byte(reply))
-		return
-	}
-	l2, _ := reader.ReadString(byte('\n'))
-	l3, _ := reader.ReadString(byte('\n'))
-	l4, _ := reader.ReadString(byte('\n'))
-
-	message := l1 + l2 + l3 + l4
-	//n, _ := conn.Read(buf)
-	interpretMessage(message, reader, writer, terminate_chan, rooms)
-}
-
-func interpretMessage(message string, reader *bufio.Reader, writer *bufio.Writer, terminate_chan chan bool, rooms map[string]chan user) {
-	// Dict of rooms with channels, send new connections via the socket to the thread.
-	log.Print("Interpreting message " + message)
-	attribs := strings.Split(message, "\n")
-	log.Print(len(attribs))
-	if len(attribs) < 3 {
-		return
-	}
-	log.Print(attribs[0][0:13])
-	if attribs[0][0:13] == "JOIN_CHATROOM" {
-		log.Print("User is joining a room")
-		log.Print(attribs[3])
-		username := strings.TrimSpace(strings.Join(strings.Split(attribs[3], ":")[1:], ""))
-		log.Print(username)
-		var new_user_obj user
-		new_user := &new_user_obj
-		new_user.username = username
-		new_user.reader = reader
-		new_user.writer = writer
-		new_user.join_id = "0"
-		roomName := attribs[0][14:]
-		room := rooms[roomName]
-		if room == nil {
-			rooms[roomName] = make(chan user)
-			log.Print("Creating chat room")
-			go chatRoom(new_user, rooms[roomName], roomName)
-			reply := "JOINED_CHATROOM:" + roomName + "\nSERVER_IP: 10.62.0.83\nPORT: 8000\nROOM_REF: 1\nJOIN_ID: 0\n"
-			writer.Write([]byte(reply))
-			writer.Flush()
-		} else {
-			// Room already exists, send the conn in  the channel
-			room <- *new_user
-			writer.Write([]byte("You have been connected\n"))
-		}
-	}
-
-}
-
-func chatRoom(initial_user *user, room_channel chan user, roomName string) {
-	users := make([]user, 0, 0)
-	users = append(users, *initial_user)
-	sendMessages(initial_user.username+" has joined", users, *initial_user, strings.Split(roomName, "room")[1])
-
+	var new_user user
 	for {
-		select {
-		case newUser := <-room_channel:
-			users = append(users, newUser)
-			sendMessages(initial_user.username+" has joined", users, newUser, roomName)
-		default:
-			for i := 0; i < len(users); i++ {
-				mesg, _ := users[i].reader.ReadString('\n')
-				//log.Print("User sent message: " + mesg)
-				if strings.HasPrefix(mesg, "LEAVE_CHATROOM") {
-					users[i].writer.Write([]byte("LEFT_CHATROOM:" + strings.Split(roomName, "room")[1] + "\nJOIN_ID:" + users[i].join_id + "\n"))
-					users[i].writer.Write([]byte("CHAT:" + strings.Split(roomName, "room")[1] + "\nCLIENT_NAME:" + users[i].username + "\nMESSAGE: " + users[i].username + " has left the chatroom"))
+		l1, _ := reader.ReadString(byte('\n'))
 
-					users[i].writer.Flush()
-				} else {
-					sendMessages(mesg, users, users[i], roomName)
-				}
-			}
-
+		if l1 == "KILL_SERVICE" {
+			os.Exit(0)
 		}
-	}
-}
 
-/*
-   sendMessages takes a message, a sender and a list of the users connections whom are in the chatroom
-*/
-func sendMessages(message string, users []user, sender user, roomName string) {
-	for i := 0; i < len(users); i++ {
-		//log.Print("Sending...")
-		if users[i] == sender {
-			log.Print(sender.username)
-			mesg := "CHAT: " + roomName + "\nCLIENT_NAME:" + sender.username + "\nMESSAGE:" + string(message) + "\n\n"
-			users[i].writer.Write([]byte(mesg))
-			users[i].writer.Flush()
-			log.Print("Sent message")
+		if strings.HasPrefix(l1, "HELO") {
+			reply := l1 + "IP:10.62.0.83\nPort:8000\nStudentID:13319024"
+			conn.Write([]byte(reply))
+			return
+		}
+		l2, _ := reader.ReadString(byte('\n'))
+		l3, _ := reader.ReadString(byte('\n'))
+		l4, _ := reader.ReadString(byte('\n'))
+		if new_user == nil {
+			new_user = newUser(reader, writer, l4)
+		}
+		message := l1 + l2 + l3 + l4
+
+		// Dict of rooms with channels, send new connections via the socket to the thread.
+		log.Print("Interpreting message " + message)
+		lines := strings.Split(message, "\n")
+		log.Print(len(lines))
+		if len(lines) < 3 {
+			return
+		}
+		if strings.HasPrefix(lines[0], "CHAT:") {
+			roomName := strings.Split(lines[0], "CHAT:")
+			room := rooms[roomName]
+			messageRoom(new_user, room)
+		} else if strings.HasPrefix(lines[0], "JOIN_CHATROOM") {
+			roomName := lines[0][14:]
+			room := rooms[roomName]
+			if room == nil {
+				// Room doesn't exist, make it
+				rooms[roomName] = newChatroom(roomName)
+				go chatRoom(new_user, rooms[roomName])
+			} else {
+				// Room already exists, send the conn in  the channel
+				joinRoom(new_user, room)
+			}
+		} else if strings.HasPrefix(lines[0], "LEAVE_CHATROOM") {
+			leaveRoom(new_user, room)
 		}
 	}
 }
