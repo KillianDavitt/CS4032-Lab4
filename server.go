@@ -90,7 +90,7 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 			var room *chatroom
 			log.Print(roomId)
 			log.Print("Getting a room with id:")
-			log.Print(RoomId)
+			log.Print(roomId)
 			for _, v := range rooms {
 				log.Print("new id")
 				log.Print(v.RoomId)
