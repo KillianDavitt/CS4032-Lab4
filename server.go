@@ -77,13 +77,14 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 			log.Print("found room")
 			if room == nil {
 				// Room doesn't exist, make it
-				rooms[roomName] = newRoom(roomName)
+				rooms[roomName] = newRoom(roomName, len(rooms)+1)
 				go chatRoom(new_user, rooms[roomName])
 			} else {
 				// Room already exists, send the conn in  the channel
 				joinRoom(new_user, room)
 			}
 		} else if strings.HasPrefix(lines[0], "LEAVE_CHATROOM") {
+			log.Print("Leaving chatroom")
 			roomName := strings.Split(lines[0], "LEAVE_CHATROOM:")[1]
 			room := rooms[roomName]
 			leaveRoom(new_user, room)
