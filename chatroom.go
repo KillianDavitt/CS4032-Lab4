@@ -57,13 +57,13 @@ func chatRoom(initial_user *User, room *chatroom) {
 
 		case remUser := <-room.RemoveUsers:
 			log.Print("leaving room in goroutine")
-			
-			log.Print("Sent leave message back to sender")
-			leftMesg := "CHAT:" + strconv.Itoa(room.RoomId) + "\nCLIENT_NAME:" + remUser.Username + "\nMESSAGE: " + remUser.Username + " has left the chatroom\n\n"
-			sendToUsers(leftMesg, room)
-            mesg := "LEFT_CHATROOM:" + strconv.Itoa(room.RoomId) + "\nJOIN_ID:" + remUser.JoinId + "\n"
+			mesg := "LEFT_CHATROOM:" + strconv.Itoa(room.RoomId) + "\nJOIN_ID:" + remUser.JoinId + "\n"
 			remUser.Writer.Write([]byte(mesg))
 			remUser.Writer.Flush()
+
+			log.Print("Sent leave message back to sender")
+			leftMesg := "CHAT:" + strconv.Itoa(room.RoomId) + "\nCLIENT_NAME:" + remUser.Username + "\nMESSAGE: " + remUser.Username + " has left the chatroom\n\n"
+
 			i := 0
 			for i = 0; i < len(room.Users); i++ {
 				if room.Users[i] == remUser {
@@ -71,6 +71,8 @@ func chatRoom(initial_user *User, room *chatroom) {
 				}
 			}
 			room.Users = append(room.Users[:i], room.Users[i+1:]...)
+
+			sendToUsers(leftMesg, room)
 
 		case message := <-room.Messages:
 			sendMessages(message, room, &room.Users[0])
