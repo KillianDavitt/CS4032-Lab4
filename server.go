@@ -39,7 +39,7 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 	madeUser := false
 	for {
 		l1, _ := reader.ReadString(byte('\n'))
-
+		log.Print("Got l1")
 		if l1 == "KILL_SERVICE" {
 			os.Exit(0)
 		}
@@ -51,6 +51,7 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 		}
 		l2, _ := reader.ReadString(byte('\n'))
 		l3, _ := reader.ReadString(byte('\n'))
+		log.Print("got l2 and l3")
 		if strings.HasPrefix(l1, "LEAVE_CHATROOM") {
 			log.Print("Leaving chatroom")
 			roomId := strings.TrimSpace(strings.Split(l1, "LEAVE_CHATROOM:")[1])
