@@ -11,14 +11,16 @@ type chatroom struct {
 	RemoveUsers chan User
 	Messages    chan string
 	RoomName    string
+	RoomId      int
 }
 
-func newRoom(roomName string) *chatroom {
+func newRoom(roomName string, id int) *chatroom {
 	new_room := &chatroom{}
 	new_room.NewUser = make(chan User)
 	new_room.RemoveUsers = make(chan User)
 	new_room.Messages = make(chan string)
 	new_room.RoomName = roomName
+	new_room.RoomId = id
 	return new_room
 }
 
@@ -39,7 +41,7 @@ func chatRoom(initial_user *User, room *chatroom) {
 	users = append(users, *initial_user)
 	room.Users = users
 	log.Print("New chatroom is made")
-	initial_user.Writer.Write([]byte("JOINED_CHATROOM: " + room.RoomName + "\nSERVER_IP: 10.82.0.63\nPORT: 8000\nROOM_REF: 1\nJOIN_ID: 2\n"))
+	initial_user.Writer.Write([]byte("JOINED_CHATROOM: " + room.RoomName + "\nSERVER_IP: 10.82.0.63\nPORT: 8000\nROOM_REF: " + string(room.RoomId) + "\nJOIN_ID: 2\n"))
 	sendMessages(initial_user.Username+" has joined", room, initial_user)
 	for {
 		select {
@@ -48,8 +50,8 @@ func chatRoom(initial_user *User, room *chatroom) {
 			sendMessages(newUser.Username+" has joined", room, &newUser)
 
 		case remUser := <-room.RemoveUsers:
-			mesg := "LEFT_CHATROOM:" + strings.Split(room.RoomName, "room")[1] + "\nJOIN_ID:" + remUser.JoinId + "\n"
-			sendToUsers(mesg, room)
+			mesg := "LEFT_CHATROOM:" + string(room.RoomId) + "\nJOIN_ID:" + remUser.JoinId + "\n"
+			remUser.Writer.Write([]byte(mesg))
 			leftMesg := "CHAT:" + strings.Split(room.RoomName, "room")[1] + "\nCLIENT_NAME:" + remUser.Username + "\nMESSAGE: " + remUser.Username + " has left the chatroom"
 			sendToUsers(leftMesg, room)
 
