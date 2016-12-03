@@ -72,7 +72,7 @@ func chatRoom(initial_user *User, room *chatroom) {
    sendMessages takes a message, a sender and a list of the users connections whom are in the chatroom
 */
 func sendMessages(message string, room *chatroom, sender *User) {
-	mesg := "CHAT: " + room.RoomName + "\nCLIENT_NAME: " + sender.Username + "\nMESSAGE:" + message + "\n\n"
+	mesg := "CHAT: " + "1" + "\nCLIENT_NAME: " + sender.Username + "\nMESSAGE:" + message + "\n\n"
 
 	sendToUsers(mesg, room)
 }
