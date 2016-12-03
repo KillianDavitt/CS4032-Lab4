@@ -100,7 +100,10 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 			}
 			log.Print("Have a room now")
 			message := strings.Split(lines[3], "MESSAGE:")[1]
-			messageRoom(message, room)
+			messageRoom(struct {
+				User
+				string
+			}{*new_user, message}, room)
 		} else if strings.HasPrefix(lines[0], "JOIN_CHATROOM:") {
 			log.Print("Joining chatroom")
 			roomName := lines[0][14:]

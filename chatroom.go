@@ -9,16 +9,22 @@ type chatroom struct {
 	Users       []User
 	NewUser     chan User
 	RemoveUsers chan User
-	Messages    chan string
-	RoomName    string
-	RoomId      int
+	Messages    chan struct {
+		User
+		string
+	}
+	RoomName string
+	RoomId   int
 }
 
 func newRoom(roomName string, id int) *chatroom {
 	new_room := &chatroom{}
 	new_room.NewUser = make(chan User)
 	new_room.RemoveUsers = make(chan User)
-	new_room.Messages = make(chan string)
+	new_room.Messages = make(chan struct {
+		User
+		string
+	})
 	new_room.RoomName = roomName
 	new_room.RoomId = id
 	log.Print(id)
@@ -36,7 +42,10 @@ func joinRoom(joinee *User, room *chatroom) {
 	room.NewUser <- *joinee
 }
 
-func messageRoom(message string, room *chatroom) {
+func messageRoom(message struct {
+	User
+	string
+}, room *chatroom) {
 	room.Messages <- message
 }
 
@@ -78,7 +87,7 @@ func chatRoom(initial_user *User, room *chatroom) {
 			room.Users = append(room.Users[:i], room.Users[i+1:]...)
 
 		case message := <-room.Messages:
-			sendMessages(message, room, &room.Users[0])
+			sendMessages(message.string, room, &message.User)
 		default:
 		}
 	}
