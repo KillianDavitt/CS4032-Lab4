@@ -86,8 +86,17 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 			return
 		}
 		if strings.HasPrefix(lines[0], "CHAT:") {
-			roomName := strings.Split(lines[0], "CHAT:")[1]
+			roomId := strings.Split(lines[0], "CHAT:")[1]
 			room := rooms[roomName]
+            var room *chatroom
+			log.Print(roomId)
+			for _, v := range rooms {
+				log.Print(v.RoomId)
+				if strconv.Itoa(v.RoomId) == roomId {
+					room = v
+				}
+			}
+
 			messageRoom("HI", room)
 		} else if strings.HasPrefix(lines[0], "JOIN_CHATROOM:") {
 			log.Print("Joining chatroom")
