@@ -54,8 +54,8 @@ func chatRoom(initial_user *User, room *chatroom) {
 		select {
 		case newUser := <-room.NewUser:
 			room.Users = append(room.Users, newUser)
-            initial_user.Writer.Write([]byte("JOINED_CHATROOM: " + room.RoomName + "\nSERVER_IP: 10.82.0.63\nPORT: 8000\nROOM_REF: " + strconv.Itoa(room.RoomId) + "\nJOIN_ID: " + initial_user.JoinId + "\n"))
-	        initial_user.Writer.Flush()
+			newUser.Writer.Write([]byte("JOINED_CHATROOM: " + room.RoomName + "\nSERVER_IP: 10.82.0.63\nPORT: 8000\nROOM_REF: " + strconv.Itoa(room.RoomId) + "\nJOIN_ID: " + initial_user.JoinId + "\n"))
+			newUser.Writer.Flush()
 
 			sendMessages(newUser.Username+" has joined", room, &newUser)
 
