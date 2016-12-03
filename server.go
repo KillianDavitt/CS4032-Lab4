@@ -38,6 +38,7 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 	var new_user *User
 	madeUser := false
 	for {
+		log.Print("About to get l1")
 		l1, _ := reader.ReadString(byte('\n'))
 		log.Print("Got l1")
 		if l1 == "KILL_SERVICE" {
