@@ -86,7 +86,7 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 			return
 		}
 		if strings.HasPrefix(lines[0], "CHAT:") {
-			roomId := strings.Split(lines[0], "CHAT:")[1]
+			roomId := strings.TrimSpace(strings.Split(lines[0], "CHAT:")[1])
 			var room *chatroom
 			log.Print(roomId)
 			log.Print("Getting a room with id:")
