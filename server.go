@@ -77,7 +77,7 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 			log.Print("found room")
 			if room == nil {
 				// Room doesn't exist, make it
-				rooms[roomName] = newRoom()
+				rooms[roomName] = newRoom(roomName)
 				go chatRoom(new_user, rooms[roomName])
 			} else {
 				// Room already exists, send the conn in  the channel
