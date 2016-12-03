@@ -19,5 +19,6 @@ func newUser(reader *bufio.Reader, writer *bufio.Writer, l4 string) *User {
 	username = strings.Replace(username, "\n", "", 2)
 	id := "3"
 	new_user := &User{reader, writer, username, id}
+	new_user.JoinId = "2"
 	return new_user
 }
