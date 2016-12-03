@@ -65,6 +65,7 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 			log.Print("have a room to leave")
 			log.Print(room.RoomName)
 			leaveRoom(new_user, room)
+			continue
 		}
 
 		l4, _ := reader.ReadString(byte('\n'))
