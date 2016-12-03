@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -50,6 +51,22 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 		}
 		l2, _ := reader.ReadString(byte('\n'))
 		l3, _ := reader.ReadString(byte('\n'))
+		if strings.HasPrefix(l1, "LEAVE_CHATROOM") {
+			log.Print("Leaving chatroom")
+			roomId := strings.TrimSpace(strings.Split(l1, "LEAVE_CHATROOM:")[1])
+			var room *chatroom
+			log.Print(roomId)
+			for _, v := range rooms {
+				log.Print(v.RoomId)
+				if strconv.Itoa(v.RoomId) == roomId {
+					room = v
+				}
+			}
+			log.Print("have a room to leave")
+			log.Print(room.RoomName)
+			leaveRoom(new_user, room)
+		}
+
 		l4, _ := reader.ReadString(byte('\n'))
 		if !madeUser {
 			log.Print("made new user")
@@ -83,11 +100,6 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 				// Room already exists, send the conn in  the channel
 				joinRoom(new_user, room)
 			}
-		} else if strings.HasPrefix(lines[0], "LEAVE_CHATROOM") {
-			log.Print("Leaving chatroom")
-			roomName := strings.Split(lines[0], "LEAVE_CHATROOM:")[1]
-			room := rooms[roomName]
-			leaveRoom(new_user, room)
 		}
 	}
 }

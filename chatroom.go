@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"strconv"
-	"strings"
 )
 
 type chatroom struct {
@@ -27,6 +26,9 @@ func newRoom(roomName string, id int) *chatroom {
 }
 
 func leaveRoom(leaver *User, room *chatroom) {
+	log.Print(leaver.Username)
+	log.Print("sending to chan to leave")
+
 	room.RemoveUsers <- *leaver
 }
 
@@ -53,9 +55,12 @@ func chatRoom(initial_user *User, room *chatroom) {
 			sendMessages(newUser.Username+" has joined", room, &newUser)
 
 		case remUser := <-room.RemoveUsers:
+			log.Print("leaving room in goroutine")
 			mesg := "LEFT_CHATROOM:" + strconv.Itoa(room.RoomId) + "\nJOIN_ID:" + remUser.JoinId + "\n"
 			remUser.Writer.Write([]byte(mesg))
-			leftMesg := "CHAT:" + strings.Split(room.RoomName, "room")[1] + "\nCLIENT_NAME:" + remUser.Username + "\nMESSAGE: " + remUser.Username + " has left the chatroom"
+			remUser.Writer.Flush()
+			log.Print("Sent leave message back to sender")
+			leftMesg := "CHAT:" + strconv.Itoa(room.RoomId) + "\nCLIENT_NAME:" + remUser.Username + "\nMESSAGE: " + remUser.Username + " has left the chatroom\n"
 			sendToUsers(leftMesg, room)
 
 			i := 0
