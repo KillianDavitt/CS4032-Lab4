@@ -69,11 +69,6 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 			}
 		default:
 		}
-		if len(l1)>3 {
-			log.Print(l1)
-		} else {
-			os.Exit(0)
-		}
 		if strings.HasPrefix(l1, "HELO") {
 			reply := l1 + "IP:10.62.0.83\nPort:8000\nStudentID:13319024"
 			conn.Write([]byte(reply))
