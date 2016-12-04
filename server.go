@@ -27,6 +27,13 @@ func main() {
 			fmt.Println("Fatal Error")
 		}
 		go handleConnection(conn, &listener, terminate_chan, rooms)
+		select {
+		case term := <- terminate_chan:
+			if term {
+				conn.Close()
+				terminate_chan <- true
+			}
+		}
 	}
 }
 
@@ -39,7 +46,14 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 	for {
 		l1, _ := reader.ReadString(byte('\n'))
 		if l1 == "KILL_SERVICE\n" {
-			os.Exit(0)
+			terminate_chan <- true
+		}
+		select {
+			case term := <- terminate_chan:
+			if term{
+				conn.Close()
+				terminate_chan <- true
+			}
 		}
 		if len(l1)>3 {
 			log.Print(l1)
