@@ -30,6 +30,17 @@ func newRoom(roomName string, id int) *chatroom {
 	return new_room
 }
 
+func getRoomById(roomId string, rooms map[string]*chatroom) *chatroom {
+	var room *chatroom
+	for _, v := range rooms {
+		if strconv.Itoa(v.RoomId) == roomId {
+			room = v
+		}
+	}
+	return room
+
+}
+
 func leaveRoom(leaver *User, room *chatroom) {
 	room.RemoveUsers <- *leaver
 }

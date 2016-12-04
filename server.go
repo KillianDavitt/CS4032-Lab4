@@ -6,7 +6,6 @@ import (
 	"log"
 	"net"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -50,22 +49,13 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 			conn.Write([]byte(reply))
 			return
 		}
-		l2, _ := reader.ReadString(byte('\n'))
-		l3, _ := reader.ReadString(byte('\n'))
-		log.Print("got l2 and l3")
+		_, _ = reader.ReadString(byte('\n'))
+		_, _ = reader.ReadString(byte('\n'))
+
 		if strings.HasPrefix(l1, "LEAVE_CHATROOM") {
 			log.Print("Leaving chatroom")
 			roomId := strings.TrimSpace(strings.Split(l1, "LEAVE_CHATROOM:")[1])
-			var room *chatroom
-			log.Print(roomId)
-			for _, v := range rooms {
-				log.Print(v.RoomId)
-				if strconv.Itoa(v.RoomId) == roomId {
-					room = v
-				}
-			}
-			log.Print("have a room to leave")
-			log.Print(room.RoomName)
+			room := getRoomById(roomId, rooms)
 			leaveRoom(new_user, room)
 			continue
 		}
@@ -73,13 +63,8 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 		l4, _ := reader.ReadString(byte('\n'))
 		if strings.HasPrefix(l1, "CHAT:") {
 			roomId := strings.TrimSpace(strings.Split(l1, "CHAT:")[1])
-			var room *chatroom
-			for _, v := range rooms {
-				if strconv.Itoa(v.RoomId) == roomId {
-					room = v
-				}
-			}
 			message := strings.Split(l4, "MESSAGE:")[1]
+			room := getRoomById(roomId, rooms)
 			messageRoom(struct {
 				User
 				string
@@ -91,14 +76,10 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 			madeUser = true
 			new_user = newUser(reader, writer, l4, len(rooms))
 		}
-		message := l1 + l2 + l3 + l4
 
-		// Dict of rooms with channels, send new connections via the socket to the thread.
-		log.Print("Interpreting message " + message)
-		lines := strings.Split(message, "\n")
 		
-		if strings.HasPrefix(lines[0], "JOIN_CHATROOM:") {
-			roomName := lines[0][14:]
+		if strings.HasPrefix(l1, "JOIN_CHATROOM:") {
+			roomName := l1[14:]
 			room := rooms[roomName]
 			if room == nil {
 				// Room doesn't exist, make it
