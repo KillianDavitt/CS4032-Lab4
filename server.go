@@ -9,6 +9,14 @@ import (
 	"strings"
 )
 
+func waitForTerm(term_chan chan bool, list net.Listener){
+	term := <- term_chan
+	if term {
+		list.Close()
+	}
+	term_chan <- true
+}
+
 func main() {
 	port := os.Args[1]
 	port = ":" + port
@@ -19,9 +27,14 @@ func main() {
 	rooms := make(map[string]*chatroom)
 
 	terminate_chan := make(chan bool)
+	go waitForTerm(terminate_chan, listener)
 	for {
 		conn, err := listener.Accept()
+		if err != nil {
+			log.Fatal(err)
+		}
 		log.Print("New conn")
+
 		defer conn.Close()
 		if err != nil {
 			fmt.Println("Fatal Error")
@@ -29,11 +42,14 @@ func main() {
 		go handleConnection(conn, &listener, terminate_chan, rooms)
 		select {
 		case term := <- terminate_chan:
+			log.Print("Got a term")
 			if term {
 				conn.Close()
+				log.Print("Closing the main conn")
 				terminate_chan <- true
 			}
-			default:
+		default:
+			log.Print("main default")
 		}
 	}
 }
@@ -46,17 +62,22 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 	madeUser := false
 	for {
 		l1, _ := reader.ReadString(byte('\n'))
+		log.Print("Got an l1")
 		if l1 == "KILL_SERVICE\n" {
+			log.Print("KILL")
 			terminate_chan <- true
+			log.Print("sending the kill service chann")
 		}
+		log.Print("selecting")
 		select {
 		case term := <- terminate_chan:
 			if term{
+				log.Print("Received close")
 				conn.Close()
 				terminate_chan <- true
 			}
 		default:
-			
+			log.Print("default")
 		}
 		if len(l1)>3 {
 			log.Print(l1)
