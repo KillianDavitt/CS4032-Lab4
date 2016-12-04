@@ -62,6 +62,8 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 			roomId := strings.TrimSpace(strings.Split(l1, "CHAT:")[1])
 			message := strings.Split(l4, "MESSAGE:")[1]
 			room := getRoomById(roomId, rooms)
+			_, _ = reader.ReadString(byte('\n'))
+
 			messageRoom(struct {
 				User
 				string
