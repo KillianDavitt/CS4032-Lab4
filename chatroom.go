@@ -27,14 +27,10 @@ func newRoom(roomName string, id int) *chatroom {
 	})
 	new_room.RoomName = roomName
 	new_room.RoomId = id
-	log.Print(id)
 	return new_room
 }
 
 func leaveRoom(leaver *User, room *chatroom) {
-	log.Print(leaver.Username)
-	log.Print("sending to chan to leave")
-
 	room.RemoveUsers <- *leaver
 }
 
@@ -53,9 +49,6 @@ func chatRoom(initial_user *User, room *chatroom) {
 	users := make([]User, 0, 50)
 	users = append(users, *initial_user)
 	room.Users = users
-	log.Print("New chatroom is made")
-	log.Print(string(room.RoomId))
-	log.Print("A user has been sent joined chatroom")
 	initial_user.Writer.Write([]byte("JOINED_CHATROOM: " + room.RoomName + "\nSERVER_IP: 10.82.0.63\nPORT: 8000\nROOM_REF: " + strconv.Itoa(room.RoomId) + "\nJOIN_ID: " + initial_user.JoinId + "\n"))
 	initial_user.Writer.Flush()
 	sendMessages(initial_user.Username+" has joined", room, initial_user)
