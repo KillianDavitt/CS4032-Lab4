@@ -16,6 +16,7 @@ func waitForTerm(term_chan chan bool, list net.Listener){
 		list.Close()
 	}
 	term_chan <- true
+	os.Exit(1)
 }
 
 func main() {
