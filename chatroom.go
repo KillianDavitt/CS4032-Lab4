@@ -78,7 +78,7 @@ func chatRoom(initial_user *User, room *chatroom) {
 			sendMessages(newUser.Username+" has joined", room, &newUser)
 		case disconUser := <-room.Disconnect:
 			log.Print("discon")
-			sendMessages(disconUser.Username + " has disconnected", room, disconUser)
+			sendMessages(disconUser.Username + " has disconnected", room, &disconUser)
 			
 		case remUser := <-room.RemoveUsers:
 			log.Print("leaving room in goroutine")
