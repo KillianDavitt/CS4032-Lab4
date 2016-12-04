@@ -79,7 +79,7 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 
 		
 		if strings.HasPrefix(l1, "JOIN_CHATROOM:") {
-			roomName := l1[14:]
+			roomName := strings.Replace(strings.Split(l1, "JOIN_CHATROOM:")[1], "\n", "", 2)
 			room := rooms[roomName]
 			if room == nil {
 				// Room doesn't exist, make it
