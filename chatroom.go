@@ -22,6 +22,7 @@ func newRoom(roomName string, id int) *chatroom {
 	new_room := &chatroom{}
 	new_room.NewUser = make(chan User)
 	new_room.RemoveUsers = make(chan User)
+	new_room.Disconnect = make(chan User)
 	new_room.Messages = make(chan struct {
 		User
 		string
@@ -77,6 +78,7 @@ func chatRoom(initial_user *User, room *chatroom) {
 			newUser.Writer.Flush()
 
 			sendMessages(newUser.Username+" has joined", room, &newUser)
+			
 		case disconUser := <-room.Disconnect:
 			log.Print("discon")
 			sendMessages(disconUser.Username + " has disconnected", room, &disconUser)
