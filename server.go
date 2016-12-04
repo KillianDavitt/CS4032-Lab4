@@ -60,7 +60,7 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 		l4, _ := reader.ReadString(byte('\n'))
 		if strings.HasPrefix(l1, "CHAT:") {
 			roomId := strings.TrimSpace(strings.Split(l1, "CHAT:")[1])
-			message := strings.Split(l4, "MESSAGE:")[1]
+			message := strings.Replace(strings.Split(l4, "MESSAGE:")[1], "\n", "", 3)
 			room := getRoomById(roomId, rooms)
 			_, _ = reader.ReadString(byte('\n'))
 
