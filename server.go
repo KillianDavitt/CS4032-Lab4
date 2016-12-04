@@ -69,6 +69,8 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 			leaveRoom(new_user, room)
 			continue
 		}
+
+		l4, _ := reader.ReadString(byte('\n'))
 		if strings.HasPrefix(l1, "CHAT:") {
 			roomId := strings.TrimSpace(strings.Split(l1, "CHAT:")[1])
 			var room *chatroom
@@ -77,14 +79,13 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 					room = v
 				}
 			}
-			message := strings.Split(l3, "MESSAGE:")[1]
+			message := strings.Split(l4, "MESSAGE:")[1]
 			messageRoom(struct {
 				User
 				string
 			}{*new_user, message}, room)
 		}
 
-		l4, _ := reader.ReadString(byte('\n'))
 		if !madeUser {
 			log.Print("made new user")
 			madeUser = true
