@@ -47,6 +47,7 @@ func main() {
 				conn.Close()
 				log.Print("Closing the main conn")
 				terminate_chan <- true
+				return
 			}
 		default:
 			log.Print("main default")
