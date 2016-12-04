@@ -12,6 +12,7 @@ import (
 func waitForTerm(term_chan chan bool, list net.Listener){
 	term := <- term_chan
 	if term {
+		log.Print("TERM MAIN LISTENER")
 		list.Close()
 	}
 	term_chan <- true
@@ -40,18 +41,6 @@ func main() {
 			fmt.Println("Fatal Error")
 		}
 		go handleConnection(conn, &listener, terminate_chan, rooms)
-		select {
-		case term := <- terminate_chan:
-			log.Print("Got a term")
-			if term {
-				conn.Close()
-				log.Print("Closing the main conn")
-				terminate_chan <- true
-				return
-			}
-		default:
-			log.Print("main default")
-		}
 	}
 }
 
