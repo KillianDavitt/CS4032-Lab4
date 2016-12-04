@@ -79,7 +79,7 @@ func chatRoom(initial_user *User, room *chatroom) {
 			remUser.Writer.Flush()
 
 			log.Print("Sent leave message back to sender")
-			leftMesg := "CHAT:" + strconv.Itoa(room.RoomId) + "\nCLIENT_NAME:" + remUser.Username + "\nMESSAGE: " + remUser.Username + " has left the chatroom\n\n"
+			leftMesg := "CHAT: " + strconv.Itoa(room.RoomId) + "\nCLIENT_NAME: " + remUser.Username + "\nMESSAGE: " + remUser.Username + " has left the chatroom\n\n"
 
 			sendToUsers(leftMesg, room)
 			i := 0
