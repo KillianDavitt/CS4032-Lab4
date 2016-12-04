@@ -26,7 +26,9 @@ func newUser(reader *bufio.Reader, writer *bufio.Writer, l4 string, n int) *User
 
 func disconnectUser(user *User, rooms map[string]*chatroom){
 	for _,v := range rooms {
+	// For every chatroom
 		for j:=0; j<len(v.Users); j++{
+		// Check if any of the users match
 			if v.Users[j].Username == user.Username {
 				log.Print("found a case of a chatroom to discon")
 				postDisconnect(v, user)

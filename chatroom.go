@@ -51,6 +51,7 @@ func joinRoom(joinee *User, room *chatroom) {
 }
 
 func postDisconnect(room *chatroom, user *User){
+	log.Print("Sending discon to channel")
 	room.Disconnect <- *user
 }
 
