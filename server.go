@@ -53,13 +53,11 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 	madeUser := false
 	for {
 		l1, _ := reader.ReadString(byte('\n'))
-		log.Print("Got an l1")
 		if l1 == "KILL_SERVICE\n" {
 			log.Print("KILL")
 			terminate_chan <- true
 			log.Print("sending the kill service chann")
 		}
-		log.Print("selecting")
 		select {
 		case term := <- terminate_chan:
 			if term{
@@ -68,7 +66,6 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 				terminate_chan <- true
 			}
 		default:
-			log.Print("default")
 		}
 		if len(l1)>3 {
 			log.Print(l1)
