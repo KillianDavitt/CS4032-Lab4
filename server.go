@@ -33,6 +33,7 @@ func main() {
 				conn.Close()
 				terminate_chan <- true
 			}
+			default:
 		}
 	}
 }
@@ -49,11 +50,13 @@ func handleConnection(conn net.Conn, listener *net.Listener, terminate_chan chan
 			terminate_chan <- true
 		}
 		select {
-			case term := <- terminate_chan:
+		case term := <- terminate_chan:
 			if term{
 				conn.Close()
 				terminate_chan <- true
 			}
+		default:
+			
 		}
 		if len(l1)>3 {
 			log.Print(l1)
