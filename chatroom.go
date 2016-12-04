@@ -52,7 +52,6 @@ func joinRoom(joinee *User, room *chatroom) {
 }
 
 func postDisconnect(room *chatroom, user *User){
-	log.Print("Sending discon to channel")
 	room.Disconnect <- *user
 }
 
@@ -84,12 +83,10 @@ func chatRoom(initial_user *User, room *chatroom) {
 			sendMessages(disconUser.Username + " has disconnected", room, &disconUser)
 			
 		case remUser := <-room.RemoveUsers:
-			log.Print("leaving room in goroutine")
 			mesg := "LEFT_CHATROOM:" + strconv.Itoa(room.RoomId) + "\nJOIN_ID:" + remUser.JoinId + "\n"
 			remUser.Writer.Write([]byte(mesg))
 			remUser.Writer.Flush()
 
-			log.Print("Sent leave message back to sender")
 			leftMesg := "CHAT: " + strconv.Itoa(room.RoomId) + "\nCLIENT_NAME: " + remUser.Username + "\nMESSAGE: " + remUser.Username + " has left the chatroom\n\n"
 
 			sendToUsers(leftMesg, room)
@@ -108,20 +105,14 @@ func chatRoom(initial_user *User, room *chatroom) {
 	}
 }
 
-/*
-   sendMessages takes a message, a sender and a list of the users connections whom are in the chatroom
-*/
 func sendMessages(message string, room *chatroom, sender *User) {
 	mesg := "CHAT: " + strconv.Itoa(room.RoomId) + "\nCLIENT_NAME: " + sender.Username + "\nMESSAGE:" + message + "\n\n"
-
 	sendToUsers(mesg, room)
 }
 
 func sendToUsers(message string, room *chatroom) {
 	users := room.Users
-	log.Print("sending to users: " + string(len(users)))
 	for i := 0; i < len(users); i++ {
-		log.Print("Sending to a user there Ted")
 		users[i].Writer.Write([]byte(message))
 		users[i].Writer.Flush()
 	}
