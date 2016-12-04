@@ -9,6 +9,7 @@ type chatroom struct {
 	Users       []User
 	NewUser     chan User
 	RemoveUsers chan User
+	Disconnect  chan User
 	Messages    chan struct {
 		User
 		string
@@ -49,6 +50,10 @@ func joinRoom(joinee *User, room *chatroom) {
 	room.NewUser <- *joinee
 }
 
+func postDisconnect(room *chatroom, user *User){
+	room.Disconnect <- *user
+}
+
 func messageRoom(message struct {
 	User
 	string
@@ -71,7 +76,9 @@ func chatRoom(initial_user *User, room *chatroom) {
 			newUser.Writer.Flush()
 
 			sendMessages(newUser.Username+" has joined", room, &newUser)
-
+		case _ = <-room.Disconnect:
+			log.Print("discon")
+			
 		case remUser := <-room.RemoveUsers:
 			log.Print("leaving room in goroutine")
 			mesg := "LEFT_CHATROOM:" + strconv.Itoa(room.RoomId) + "\nJOIN_ID:" + remUser.JoinId + "\n"

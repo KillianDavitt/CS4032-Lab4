@@ -23,3 +23,13 @@ func newUser(reader *bufio.Reader, writer *bufio.Writer, l4 string, n int) *User
 	new_user.JoinId = "2"
 	return new_user
 }
+
+func disconnectUser(user *User, rooms map[string]*chatroom){
+	for _,v := range rooms {
+		for j:=0; j<len(v.Users); j++{
+			if v.Users[j] == *user {
+				postDisconnect(v, user)
+			}
+		}
+	}
+}
